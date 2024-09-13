@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/google-search-atlys/static/css/main.e6c13ad2.css",
+    "main.js": "/google-search-atlys/static/js/main.4271ab68.js",
+    "static/js/453.08282535.chunk.js": "/google-search-atlys/static/js/453.08282535.chunk.js",
+    "index.html": "/google-search-atlys/index.html",
+    "main.e6c13ad2.css.map": "/google-search-atlys/static/css/main.e6c13ad2.css.map",
+    "main.4271ab68.js.map": "/google-search-atlys/static/js/main.4271ab68.js.map",
+    "453.08282535.chunk.js.map": "/google-search-atlys/static/js/453.08282535.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.4271ab68.js"
+  ]
+}
