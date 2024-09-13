@@ -1,12 +1,71 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Modal } from "antd";
+import { Spin, Modal, message } from "antd";
 import PagePagination from "../../common/Pagination";
 import axios from "axios";
-import "./index.css"; // Use this for any additional custom styling
 import ImageList from "./components/ImageList";
-import constants from '../../constants'
+import constants from '../../constants';
+import { CloseOutlined } from "@ant-design/icons";
+import { createUseStyles } from "react-jss";
+
+// Define JSS styles using createUseStyles
+const useStyles = createUseStyles({
+  imageGalleryContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+  },
+  contentWrapper: {
+    flex: 1,
+    overflowY: "auto",
+    paddingBottom: "60px", // Ensure space for the fixed pagination
+  },
+  paginationContainer: {
+    position: "fixed",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "white",
+    padding: "10px 0",
+    boxShadow: "0 -2px 5px rgba(0, 0, 0, 0.1)",
+    textAlign: "center",
+  },
+  imageGallery: {
+    overflowY: "scroll",
+    height: "90vh",
+    padding: '10px',
+  },
+  spinnerContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    width: "100vw",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+  },
+  imageDrawer: {
+    width: "30%",
+    position: "fixed",
+    right: 0,
+    top: 0,
+    height: "100vh",
+    backgroundColor: "#fff",
+    zIndex: 1000,
+  },
+  closeButton: {
+    margin: '10px',
+    cursor: 'pointer',
+  },
+  modalImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+  }
+});
 
 const ImageGallery = () => {
+  const classes = useStyles();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +73,7 @@ const ImageGallery = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [imageDetails, setImageDetails] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(false); // To detect mobile or desktop view
+  const [isMobileView, setIsMobileView] = useState(false);
   const [pageSize, setPageSize] = useState(20);
 
   useEffect(() => {
@@ -34,16 +93,14 @@ const ImageGallery = () => {
     setLoading(false);
   };
 
-  // Detect screen size for mobile vs desktop view
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768); // Mobile view if screen width <= 768px
+      setIsMobileView(window.innerWidth <= 768);
     };
-    handleResize(); // Call on mount to set the initial value
-    window.addEventListener("resize", handleResize); // Listen for window resize
-
+    handleResize();
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize); // Cleanup on unmount
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -53,12 +110,12 @@ const ImageGallery = () => {
       const response = await axios.get(imageDetailUrl);
       setImageDetails(response.data);
       if (isMobileView) {
-        setIsModalVisible(true); // Open modal for mobile
+        setIsModalVisible(true);
       } else {
-        setIsDrawerVisible(true); // Open drawer for desktop
+        setIsDrawerVisible(true);
       }
     } catch (error) {
-      console.error("Failed to fetch image details:", error);
+      message.error("Failed to fetch image details");
     }
   };
 
@@ -73,62 +130,49 @@ const ImageGallery = () => {
   };
 
   return (
-    <div className="image-gallery-container">
-      {/* Left Side Scrollable Image Grid */}
-      <div className="image-gallery">
-        <h2>Image Search Page</h2>
+    <div className={classes.imageGalleryContainer}>
+      <div className={classes.imageGallery}>
+        <h2 style={{ padding: "10px 10px" }}>Image Search Page</h2>
         {loading ? (
+          <div className={classes.spinnerContainer}>
             <Spin tip="Loading..." />
+          </div>
         ) : (
-            <ImageList
-                images={images} 
-                handleImageClick={handleImageClick}
-                isDrawerVisible={isDrawerVisible}
-            />
+          <ImageList
+            images={images}
+            handleImageClick={handleImageClick}
+            isDrawerVisible={isDrawerVisible}
+          />
         )}
       </div>
-      {/* Pagination */}
-      <div className="pagination-container">
+
+      <div className={classes.paginationContainer}>
         <PagePagination
           current={currentPage}
           pageSize={pageSize}
           totalContent={totalImages}
           setCurrentPage={setCurrentPage}
           setPageSize={setPageSize}
-          style={{ margin: "10px", textAlign: "center" }}
-          />
+        />
       </div>
 
-      {/* Image Drawer (Fixed) */}
       {isDrawerVisible && (
-        <div
-          className="image-drawer"
-          style={{
-            width: "30%",
-            position: "fixed",
-            right: 0,
-            top: 0,
-            height: "100vh",
-            backgroundColor: "#fff",
-            zIndex: 1000,
-          }}
-        >
-          <button onClick={handleDrawerClose} style={{ margin: "10px" }}>
-            Close
-          </button>
+        <div className={classes.imageDrawer}>
+          <CloseOutlined onClick={handleDrawerClose} className={classes.closeButton} />
           {imageDetails ? (
             <img
               alt={imageDetails.author}
               src={imageDetails.download_url}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              className={classes.modalImage}
             />
           ) : (
             <Spin tip="Loading..." />
           )}
         </div>
       )}
+
       <Modal
-        visible={isModalVisible}
+        open={isModalVisible}
         footer={null}
         onCancel={handleModalClose}
         centered
@@ -137,7 +181,7 @@ const ImageGallery = () => {
           <img
             alt={imageDetails.author}
             src={imageDetails.download_url}
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            className={classes.modalImage}
           />
         ) : (
           <Spin tip="Loading..." />
