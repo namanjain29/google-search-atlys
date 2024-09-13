@@ -77,10 +77,7 @@ const ImageGallery = () => {
   const [pageSize, setPageSize] = useState(20);
 
   useEffect(() => {
-    fetchImages(currentPage);
-  }, [currentPage, pageSize]);
-
-  const fetchImages = async (page) => {
+    const fetchImages = async (page) => {
     setLoading(true);
     try {
       const imageListUrl = constants.URLS.imageList(page, pageSize);
@@ -92,6 +89,9 @@ const ImageGallery = () => {
     }
     setLoading(false);
   };
+
+    fetchImages(currentPage);
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     const handleResize = () => {
